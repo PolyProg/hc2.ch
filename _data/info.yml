@@ -1,30 +1,30 @@
 # Event name
-name: ExampleEvent 2020
+name: HC2 2019
 
 # Event date, in free-text format
-date: February 30-31
+date: April 13
 
 # Event location
-location: Building 01, Example University
+location: CO Building, EPFL
 
 # Event description; short is for e.g. Facebook shared links, long appears on the home page.
-description_short: Student-run hackathon at EPFL, Switzerland
+description_short: Switzerland's biggest programming competition!
 description_long: |-
-  This is an example event for this template!
+  HC2 is Switzerland's biggest programming contest, held at EPFL in Lausanne.
 
-  It's there to show off the capabilities of the template.
+  Solve challenging problems in teams of up to 3 people using short programs.
 
-  No coding needed, just change the data!
+  Meet new friends, win prizes, and have fun!
 
 # Contact email. Use a bot-defeating format, otherwise you'll get spammed.
-email: info at example dot org
+email: info at hc2 dot ch
 
 # Social networks. Twitter is optional, but you really should have a Facebook page.
-facebook: ???
-twitter: ???
+facebook: polyprog
+#twitter: ???
 
 # Accent color of the website
-color: '#6497b1'
+color: '#495076'
 
 # Font used by the website.
 # To use a custom font, see the ReadMe file.
@@ -33,5 +33,12 @@ font: Courier, monospace
 
 # Links to past editions
 past_editions:
-  2010: http://2010.example.org
-  2000: http://2000.example.org
+  2018: https://2018.hc2.ch
+  2017: https://2017.hc2.ch
+  2016: https://2016.hc2.ch
+  2015: https://2015.hc2.ch
+  2014: https://2014.hc2.ch
+  2013: https://2013.hc2.ch
+  2012: https://2012.hc2.ch
+  2011: https://2011.hc2.ch
+  2010: https://2010.hc2.ch

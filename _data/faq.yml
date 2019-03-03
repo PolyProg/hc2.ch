@@ -5,15 +5,30 @@
 # - Use the weird |- syntax to allow answers to span lines.
 # - End lines with two spaces if you want to force a line break, otherwise the line break is ignored.
 
-- q: What is this?
+- q: Can I participate?
   a: |- 
-        An example website for this template.  
-        Isn't it awesome?
+        You must be **at least 14 years old**.  
+        No need to be a student, but students and professionals compete in separate categories.
 
-- q: Can I use it?
+- q: What should I bring?
   a: |-
-        Of course! Just comply with the license, i.e. credit the authors.
+        Your good mood! Nothing is needed - we will provide your team with a computer, pen and paper.
 
-- q: Thank you!
+- q: Where is it?
   a: |-
-        You're welcome!
+        HC2 is in the CO building at EPFL.  
+        You can find directions [here](http://information.epfl.ch/access).
+
+- q: What about food?
+  a: |-
+        We will provide breakfast and lunch; you can optionally join for dinner for CHF 15 more.
+
+- q: What if I don't have a team?
+  a: |-
+        Don't worry! Register as a single participant, and we'll try to find you a team.  
+        You can always participate alone, of course.
+
+- q: Which programming languages are available?
+  a: |-
+        C++17, Java 8, Python 2.7 and Python 3.5.  
+        You will be able to code using Emacs, Geany, Vim, NetBeans, Code::Blocks, Eclipse, and GDB.
