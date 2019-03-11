@@ -6,6 +6,42 @@ group:
 # People organizing the event, and their websites.
 # See the ReadMe file for information on pictures.
 people:
+  - first: Amer
+    last: Chamseddine
+    link: https://linkedin.com/in/accandme
+
+  - first: Betty
+    last: Pirelli
+    link: https://linkedin.com/in/blagovestakostova
+
+  - first: Buddhima
+    last: Gamlath
+    link: https://linkedin.com/in/bgamlath
+
+  - first: Chia-An
+    last: Yu
+    link: https://linkedin.com/in/chia-an-yu
+
+  - first: Jakub
+    last: Tarnawski
+    link: https://linkedin.com/in/jakubtarnawski
+
+  - first: Joseph
+    last: Vavalà
+    link: https://linkedin.com/in/joseph-vavala
+
+  - first: Lazar
+    last: Milenković
+    link: https://milenkoviclazar.github.io
+
+  - first: Michalina
+    last: Pacholska
+    link: https://linkedin.com/in/michalina-pacholska
+
+  - first: Ruofan
+    last: Zhou
+    link: https://linkedin.com/in/ruofan-zhou-4338ba88
+
   - first: Solal
     last: Pirelli
     link: https://linkedin.com/in/solalpirelli
@@ -14,6 +50,6 @@ people:
     last: Porté
     link: https://linkedin.com/in/tatiana-nikitina
 
-  - first: Ruofan
-    last: Zhou
-    link: https://people.epfl.ch/ruofan.zhou
+  - first: Wajeb
+    last: Saab
+    link: https://linkedin.com/in/wajeb-saab-b07a1355
