@@ -1,5 +1,8 @@
 # Call to action, optional.
 # If the link is set, the call will appear as a button.
 
-text: Registration is closed.
+text: |-
+  Petr Team, tap and Busted won the overall contest!  
+  Team RockETH, 3 dimensional trees and ENSL@EPFL were the next best students.  
+  Full ranking [here](/ranking.pdf).
 link:
