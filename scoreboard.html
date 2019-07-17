@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+<head>
+	<!-- DOMjudge version 5.3.3 -->
+<meta charset="utf-8"/>
+<title>Scoreboard</title>
+<style>
+body {
+	color: black;
+	background-color: white;
+	font-family: sans-serif;
+}
+
+img {	border: 0; }
+
+.sol {
+	font-weight: bold;
+	font-variant: small-caps;
+}
+
+.sol_correct      { color: green;  }
+.sol_incorrect    { color: red;    }
+.sol_queued       { color: gray;   }
+
+.prevsubmit       { color: #696969; }
+
+tr.ignore td {
+	text-decoration: line-through;
+}
+
+tr.unseen td {
+	font-weight: bold;
+}
+
+a:link, a:visited { color: blue;   }
+a:hover           { color: purple; }
+a:active          { color: red;    }
+
+.disabled         { color: silver; }
+.disabled a       { color: gray;   }
+.disabled .circle { opacity: 0.2;  }
+.nodata           { color: gray; font-style: italic; }
+
+/* general table layout (not in scoreboard or lists) */
+table {
+	border-collapse: separate;
+	border-spacing: 2px;
+}
+
+th {
+	vertical-align: bottom;
+}
+
+caption {
+	font-weight: bold;
+	margin-bottom: 1ex;
+}
+
+hr {
+	border: 0;
+	height: 1px;
+	background-color: gray;
+	margin-top: 2em;
+}
+address { font-size: smaller; }
+
+.framed {
+	border: 1px solid silver;
+	padding: 2px;
+	display: inline-block;
+}
+
+tr.unread td {
+	font-weight: bold;
+}
+
+/* more spacing in lists of teams, submissions, etc. */
+.list {
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+.list th {
+	vertical-align: bottom;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+td {
+	vertical-align: top;
+}
+
+.list tr { border-bottom: 1px solid silver; }
+.list tr.roweven { background: #ededed; }
+.list tr:hover { background: #ffffcc; }
+.list thead tr { border-bottom-color: black; }
+.list thead tr:hover { background: white; }
+.list tfoot tr:hover { background: white; }
+.list a {
+	text-decoration: none;
+	color: black;
+	display: block;
+	padding: 3px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+.list .disabled a  { color: silver;   }
+.list .editdel  a  { display: inline; white-space: nowrap; }
+
+.output_text, .editor {
+	border-top: 1px dotted #C0C0C0;
+	border-bottom: 1px dotted #C0C0C0;
+	background-color: #FAFAFA;
+	margin: 0;
+	padding: 5px;
+	font-family: monospace;
+	white-space: pre;
+}
+
+span.differ {
+	color: Red;
+}
+
+span.endline {
+	color: Orange;
+}
+
+span.extra {
+	color: Red;
+}
+
+.teamid { font-family: monospace; }
+.probid, .langid { font-variant: small-caps; }
+
+#menutop a {
+	font-weight: bold;
+	text-decoration: none;
+	background-color: #FFFFF0;
+	border: 1px solid black;
+	margin: 2px;
+	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	position: relative;
+	z-index: 1;
+}
+#menutop a.new {
+	color: #FF0000;
+}
+
+#menutopright {
+	position: absolute; right: 1ex; top: 1ex;
+	text-align: right;
+}
+#clock {
+/*	font-size: small; */
+	font-family: monospace;
+	border: 1px dashed #ccc;
+	padding: 4px;
+	color: gray;
+}
+#timeleft { color: #800080;}
+#toggles {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+fieldset {
+	margin: 2em;
+	padding: 1em;
+}
+
+.error {
+	color: red;
+	font-family: monospace;
+	border: 1px dotted red;
+}
+
+legend {
+	font-variant: small-caps;
+	font-weight: bold;
+	padding: .1ex .5ex;
+}
+
+.error legend {
+	font-size: x-large;
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+
+.center { margin: 0px auto; }
+
+.scoreboard {
+	border-collapse: collapse;
+	clear: both;
+}
+.scoreboard td {
+	font-size: small;
+	vertical-align: middle;
+	text-align: center;
+}
+.scoreboard tr {
+	border-bottom: 1px solid black;
+	height: 42px;
+}
+.scoreboard td, .scoreboard th {
+	border-right: 1px solid silver;
+}
+.scoreboard a {
+	display: block;
+	padding: 3px;
+	text-decoration: none;
+	color: black;
+}
+
+.scoreboard .scoretn {
+	padding: 0px;
+	max-width: 15em;
+	text-align: right;
+	font-weight: bold;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.scoreboard .scoreaf { white-space: nowrap; border: 0; }
+.scoreboard .scoreaf img { vertical-align: middle; }
+.univ {
+	font-size: 80%;
+	font-weight: normal;
+	color: dimgrey;
+}
+
+.scoreheader {
+	font-variant: small-caps;
+	border-bottom: 2px solid black;
+	white-space: nowrap;
+}
+
+.problempoints {
+	font-size: smaller;
+	font-weight: normal;
+	color: #303030;
+	padding-left: 3pt;
+	padding-right: 3pt;
+}
+
+.score_correct   { background: #60e760; }
+.score_first     { background: #1daa1d !important; }
+.score_pending   { background: #6666FF; }
+.score_incorrect { background: #e87272; }
+
+.tc_box { text-align:center;font-size:85%;width:1.2em;display:inline-block;padding:2px;margin:1px;color:black;}
+.tc_correct   { background: #60e760; }
+.tc_pending   { background: #6666FF; }
+.tc_unused    { background: #BBBBBB; }
+.tc_incorrect { background: #e87272; }
+
+#scoresolv,#scoretotal { width: 2.5em; }
+.scorenc,.scorett,.scorepl { text-align: center; width: 2ex; }
+.scorenc { font-weight: bold; }
+td.scorenc { border-color: silver; border-right: 0; }
+
+.scoreprob { width: 3.0em; vertical-align: middle; }
+.scoreaffil { text-align: center; }
+
+#scoresummary {
+	border-top: 2px solid black;
+	border-bottom: none;
+	font-variant: small-caps;
+}
+.scorethisisme .scoretn {
+	background: #ff6600;
+	font-weight: bold;
+}
+
+.scorelegend {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.scorelegend td {
+	text-align: center;
+	width: 25ex;
+}
+
+#lastmod {
+	position: absolute; right: 1ex; margin-top: 1em;
+}
+#lastmod, #lastmod a {
+	font-size: x-small;
+	color: gray;
+	text-align: right;
+}
+
+#teamscoresummary { margin-top: 2.5em; }
+
+#teampicture { position: absolute; right: 4ex; top: 7ex; }
+
+/* between different sortorder-categories, print a thick line */
+.sortorderswitch { border-top: 2px solid black; }
+
+/* between different contests, print a thin line */
+.contestswitch { border-top: 1px solid black; }
+
+.submissionsuccessful {
+	font-weight: bold;
+	background-color: #FFFFF0;
+	border: 1px solid black;
+	margin: 1em;
+	padding: 2px;
+	color: #006400;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+input,select,textarea {
+	border: solid 1px darkgray;
+	background-color: #F0F0F0;
+}
+input,select {
+	cursor: pointer;
+}
+
+h3.teamoverview {
+	border-top: solid 1px darkgray;
+	border-bottom: solid 1px darkgray;
+	background-color: #c4d8ff;
+	font-size: smaller;
+	font-weight: normal;
+	margin-top: 2ex;
+	padding-left: 1ex;
+}
+
+#submitlist,#clarlist {
+	width: 48%;
+}
+#submitlist {
+	position: absolute;
+	left: 1ex;
+}
+#clarlist {
+	position: absolute;
+	right: 1ex;
+}
+.compilation-success {
+	color: green;
+	font-style: italic;
+}
+.compilation-error {
+	color: red;
+	font-style: italic;
+}
+#submitform, .submissiondone {
+	text-align: center;
+}
+.submissiondone a {
+	color: red;
+}
+#submitlist .list, #clarlist .list {
+	width: 100%;
+}
+#submitlist .list th, #clarlist .list th {
+	text-align: left;
+}
+#submitlist td.result, #clarlist td.clartext {
+	width: 1000ex;
+}
+#submitlist tr.highlight {
+	background-color: #c4d8ff;
+	border-color: blue;
+}
+.errorfield {
+	border-color: red;
+	color: red;
+}
+.button {
+	border: solid 1px darkgray;
+	background-color: #F0F0F0;
+	font-size: 90%;
+}
+
+h2#teamwelcome {
+	padding-bottom: 0;
+	margin-bottom: 0;
+	margin-left: 3em;
+	font-weight: normal;
+}
+#teamwelcometeam {
+	font-weight: bold;
+}
+h3#contestnotstarted {
+	color: silver;
+	margin-top: .2ex;
+	margin-left: 8em;
+}
+
+span.fileinputs {
+	position: relative;
+}
+
+input#addfile {
+	margin-top: 1ex;
+}
+
+/* tabbed layout for multiple source files */
+.tabberlive .tabbertabhide {
+	display:none;
+}
+.tabber {
+}
+.tabberlive {
+	margin-top:1em;
+}
+ul.tabbernav
+{
+	margin:0;
+	padding: 3px 0;
+	border-bottom: 1px solid #778;
+	font: bold 12px Verdana, sans-serif;
+}
+
+ul.tabbernav li
+{
+	list-style: none;
+	margin: 0;
+	display: inline;
+}
+
+ul.tabbernav li a
+{
+	padding: 3px 0.5em;
+	margin-left: 3px;
+	border: 1px solid #778;
+	border-bottom: none;
+	background: #DDE;
+	text-decoration: none;
+}
+
+ul.tabbernav li a:link { color: #448; }
+ul.tabbernav li a:visited { color: #667; }
+
+ul.tabbernav li a:hover
+{
+	color: #000;
+	background: #AAE;
+	border-color: #227;
+}
+
+ul.tabbernav li.tabberactive a
+{
+	background-color: #fff;
+	border-bottom: 1px solid #fff;
+}
+
+ul.tabbernav li.tabberactive a:hover
+{
+	color: #000;
+	background: white;
+	border-bottom: 1px solid white;
+}
+.tabberlive .tabbertab {
+	padding:5px;
+	border:1px solid #aaa;
+	border-top:0;
+}
+.tabberlive .tabbertab h2 {
+	display:none;
+}
+
+.circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: solid 1px black;
+    display: inline-block;
+}
+
+.heart {
+	padding: .3em;
+	cursor: pointer;
+}
+
+table.lcsdiff {
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+table.lcsdiff td.linenr {
+	background-color: darkgray;
+	text-align: right;
+	border-right: solid 1px black;
+	padding-right: 7px;
+}
+
+ins {
+	background: #dfd;
+	text-decoration: none;
+}
+del {
+	background: #fdd;
+	text-decoration: none;
+}
+
+table.rejudgetable td {
+	text-align: center;
+}
+table.rejudgetable td.changed {
+	background-color: #fdd;
+	font-weight: bold;
+}
+table.rejudgetable td.identical {
+	background-color: #dfd;
+}
+table.rejudgetable td.zero {
+	background-color: #F0F8FF;
+}
+</style>
+</head>
+<body>
+<h1>Scoreboard Helvetic Coding Contest</h1>
+
+<table class="scoreboard">
+<colgroup><col id="scorerank" /><col id="scoreteamname" /></colgroup><colgroup><col id="scoresolv" /><col id="scoretotal" /></colgroup>
+<colgroup><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /><col class="scoreprob" /></colgroup>
+<thead>
+<tr class="scoreheader"><th title="rank" scope="col">rank</th><th title="team name" scope="col">team</th><th title="# solved / penalty time" colspan="2" scope="col">score</th>
+<th title="problem 'Heidi Learns Hashing (Easy)'" scope="col"><a>A <div class="circle" style="background: #FF0000;"></div></a></th><th title="problem 'Heidi Learns Hashing (Medium)'" scope="col"><a>B <div class="circle" style="background: #DD0000;"></div></a></th><th title="problem 'Heidi Learns Hashing (Hard)'" scope="col"><a>C <div class="circle" style="background: #BB0000;"></div></a></th><th title="problem 'The Doctor Meets Vader (Easy)'" scope="col"><a>D <div class="circle" style="background: #0000FF;"></div></a></th><th title="problem 'The Doctor Meets Vader (Medium)'" scope="col"><a>E <div class="circle" style="background: #0000DD;"></div></a></th><th title="problem 'The Doctor Meets Vader (Hard)'" scope="col"><a>F <div class="circle" style="background: #0000BB;"></div></a></th><th title="problem 'Heidi and the Turing Test (Easy)'" scope="col"><a>G <div class="circle" style="background: #FFFFFF;"></div></a></th><th title="problem 'Heidi and the Turing Test (Medium)'" scope="col"><a>H <div class="circle" style="background: #DDDDDD;"></div></a></th><th title="problem 'Heidi and the Turing Test (Hard)'" scope="col"><a>I <div class="circle" style="background: #BBBBBB;"></div></a></th><th title="problem 'The Cybermen Moonbase (Easy)'" scope="col"><a>J <div class="circle" style="background: #FF00FF;"></div></a></th><th title="problem 'The Cybermen Moonbase (Hard)'" scope="col"><a>K <div class="circle" style="background: #DD00DD;"></div></a></th><th title="problem 'Parallel Universes (Easy)'" scope="col"><a>L <div class="circle" style="background: #FFFF00;"></div></a></th><th title="problem 'Parallel Universes (Hard)'" scope="col"><a>M <div class="circle" style="background: #DDDD00;"></div></a></th><th title="problem 'Daleks&apos; Invasion (easy)'" scope="col"><a>N <div class="circle" style="background: #00FF00;"></div></a></th><th title="problem 'Daleks&apos; Invasion (medium)'" scope="col"><a>O <div class="circle" style="background: #00DD00;"></div></a></th><th title="problem 'Daleks&apos; Invasion (hard)'" scope="col"><a>P <div class="circle" style="background: #00BB00;"></div></a></th></tr>
+</thead>
+
+<tbody>
+<tr class="sortorderswitch" id="team:36"><td class="scorepl">1</td><td class="scoretn" style="background: #d9d9d9;">Petr Team</td><td class="scorenc">12</td><td class="scorett">960</td><td class="score_correct score_first">1/2</td><td class="score_correct">1/31</td><td class="score_incorrect">21</td><td class="score_correct">1/18</td><td class="score_correct">1/111</td><td class="score_correct score_first">3/258</td><td class="score_correct">1/24</td><td class="score_correct score_first">1/113</td><td class="score_incorrect">3</td><td class="score_correct score_first">1/45</td><td class="score_neutral">0</td><td class="score_correct">2/25</td><td class="score_neutral">0</td><td class="score_correct score_first">2/35</td><td class="score_correct score_first">2/71</td><td class="score_correct score_first">1/127</td></tr>
+<tr id="team:15"><td class="scorepl">2</td><td class="scoretn">tap</td><td class="scorenc">11</td><td class="scorett">917</td><td class="score_correct">3/23</td><td class="score_correct">1/46</td><td class="score_incorrect">10</td><td class="score_correct">1/28</td><td class="score_correct score_first">1/88</td><td class="score_incorrect">2</td><td class="score_correct">1/21</td><td class="score_correct">1/165</td><td class="score_neutral">0</td><td class="score_correct">2/132</td><td class="score_neutral">0</td><td class="score_correct">1/28</td><td class="score_neutral">0</td><td class="score_correct">1/38</td><td class="score_correct">1/101</td><td class="score_correct">3/147</td></tr>
+<tr id="team:30"><td class="scorepl">3</td><td class="scoretn" style="background: #d9d9d9;">Busted</td><td class="scorenc">11</td><td class="scorett">1280</td><td class="score_correct">1/9</td><td class="score_correct">2/115</td><td class="score_neutral">0</td><td class="score_correct">1/22</td><td class="score_correct">1/161</td><td class="score_neutral">0</td><td class="score_correct">2/20</td><td class="score_correct">1/250</td><td class="score_neutral">0</td><td class="score_correct">1/86</td><td class="score_neutral">0</td><td class="score_correct">1/29</td><td class="score_neutral">0</td><td class="score_correct">3/75</td><td class="score_correct">1/137</td><td class="score_correct">5/216</td></tr>
+<tr id="team:44"><td class="scorepl">4</td><td class="scoretn" style="background: #d9d9d9;">password1234</td><td class="scorenc">11</td><td class="scorett">1282</td><td class="score_correct">1/13</td><td class="score_correct score_first">1/27</td><td class="score_neutral">0</td><td class="score_correct">1/90</td><td class="score_correct">1/154</td><td class="score_incorrect">1</td><td class="score_correct">3/50</td><td class="score_correct">4/248</td><td class="score_neutral">0</td><td class="score_correct">1/79</td><td class="score_neutral">0</td><td class="score_correct">1/46</td><td class="score_neutral">0</td><td class="score_correct">1/60</td><td class="score_correct">1/174</td><td class="score_correct">2/201</td></tr>
+<tr id="team:40"><td class="scorepl">5</td><td class="scoretn" style="background: #d9d9d9;">Melon Eaters</td><td class="scorenc">10</td><td class="scorett">955</td><td class="score_correct">3/17</td><td class="score_correct">1/91</td><td class="score_neutral">0</td><td class="score_correct">1/27</td><td class="score_correct">1/214</td><td class="score_neutral">0</td><td class="score_correct score_first">1/15</td><td class="score_correct">1/118</td><td class="score_neutral">0</td><td class="score_correct">1/111</td><td class="score_neutral">0</td><td class="score_correct">1/44</td><td class="score_neutral">0</td><td class="score_correct">2/65</td><td class="score_correct">2/173</td><td class="score_neutral">0</td></tr>
+<tr id="team:32"><td class="scorepl">6</td><td class="scoretn" style="background: #d9d9d9;">std::mess</td><td class="scorenc">9</td><td class="scorett">786</td><td class="score_correct">1/18</td><td class="score_correct">1/68</td><td class="score_neutral">0</td><td class="score_correct">1/43</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">1/35</td><td class="score_correct">1/163</td><td class="score_neutral">0</td><td class="score_correct">1/91</td><td class="score_neutral">0</td><td class="score_correct">2/28</td><td class="score_neutral">0</td><td class="score_correct">1/76</td><td class="score_correct">4/184</td><td class="score_incorrect">5</td></tr>
+<tr id="team:16"><td class="scorepl">7</td><td class="scoretn" style="background: #d9d9d9;">Double Mighty Foot</td><td class="scorenc">9</td><td class="scorett">840</td><td class="score_correct">1/17</td><td class="score_correct">2/108</td><td class="score_neutral">0</td><td class="score_correct">2/33</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_correct">1/35</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/88</td><td class="score_neutral">0</td><td class="score_correct">1/29</td><td class="score_neutral">0</td><td class="score_correct">2/56</td><td class="score_correct">3/119</td><td class="score_correct">2/235</td></tr>
+<tr id="team:27"><td class="scorepl">8</td><td class="scoretn">Team RockETH</td><td class="scorenc">9</td><td class="scorett">899</td><td class="score_correct">1/20</td><td class="score_correct">1/112</td><td class="score_neutral">0</td><td class="score_correct">1/12</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">1/29</td><td class="score_correct">2/225</td><td class="score_neutral">0</td><td class="score_correct">2/152</td><td class="score_neutral">0</td><td class="score_correct">1/39</td><td class="score_neutral">0</td><td class="score_correct">2/67</td><td class="score_correct">1/183</td><td class="score_neutral">0</td></tr>
+<tr id="team:46"><td class="scorepl">9</td><td class="scoretn" style="background: #d9d9d9;">C(opy) P(roto) 2 P(roto)</td><td class="scorenc">9</td><td class="scorett">978</td><td class="score_correct">1/18</td><td class="score_correct">1/95</td><td class="score_neutral">0</td><td class="score_correct">1/36</td><td class="score_correct">1/214</td><td class="score_neutral">0</td><td class="score_correct">1/53</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/160</td><td class="score_neutral">0</td><td class="score_correct">1/23</td><td class="score_neutral">0</td><td class="score_correct">1/72</td><td class="score_correct">4/247</td><td class="score_neutral">0</td></tr>
+<tr id="team:47"><td class="scorepl">10</td><td class="scoretn">3 dimensional dynamic lazy augmented link/cut trees</td><td class="scorenc">9</td><td class="scorett">1028</td><td class="score_correct">1/3</td><td class="score_correct">1/64</td><td class="score_neutral">0</td><td class="score_correct">1/13</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/39</td><td class="score_correct">2/267</td><td class="score_neutral">0</td><td class="score_correct">1/130</td><td class="score_neutral">0</td><td class="score_correct">1/49</td><td class="score_neutral">0</td><td class="score_correct">4/145</td><td class="score_correct">1/238</td><td class="score_neutral">0</td></tr>
+<tr id="team:66"><td class="scorepl">11</td><td class="scoretn" style="background: #d9d9d9;">89ers</td><td class="scorenc">9</td><td class="scorett">1265</td><td class="score_correct">2/12</td><td class="score_correct">2/247</td><td class="score_neutral">0</td><td class="score_correct">1/22</td><td class="score_correct">4/242</td><td class="score_neutral">0</td><td class="score_correct">1/48</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/134</td><td class="score_neutral">0</td><td class="score_correct">2/76</td><td class="score_neutral">0</td><td class="score_correct">2/67</td><td class="score_correct">2/257</td><td class="score_neutral">0</td></tr>
+<tr id="team:64"><td class="scorepl">12</td><td class="scoretn" style="background: #d9d9d9;">All In</td><td class="scorenc">8</td><td class="scorett">767</td><td class="score_correct">1/4</td><td class="score_correct">2/101</td><td class="score_incorrect">3</td><td class="score_correct">1/30</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/76</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/139</td><td class="score_neutral">0</td><td class="score_correct score_first">1/17</td><td class="score_neutral">0</td><td class="score_correct">2/99</td><td class="score_correct">2/221</td><td class="score_neutral">0</td></tr>
+<tr id="team:68"><td class="scorepl">13</td><td class="scoretn">ENSL@EPFL w/o bugs (jk)</td><td class="scorenc">8</td><td class="scorett">913</td><td class="score_correct">1/68</td><td class="score_correct">1/230</td><td class="score_neutral">0</td><td class="score_correct">1/16</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/106</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/141</td><td class="score_neutral">0</td><td class="score_correct">1/91</td><td class="score_neutral">0</td><td class="score_correct">1/58</td><td class="score_correct">1/183</td><td class="score_neutral">0</td></tr>
+<tr id="team:21"><td class="scorepl">14</td><td class="scoretn">Exponential Time Hypothesis</td><td class="scorenc">8</td><td class="scorett">966</td><td class="score_correct">2/51</td><td class="score_correct">2/143</td><td class="score_neutral">0</td><td class="score_correct">1/14</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/38</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/201</td><td class="score_neutral">0</td><td class="score_correct">2/73</td><td class="score_neutral">0</td><td class="score_correct">2/90</td><td class="score_correct">2/236</td><td class="score_neutral">0</td></tr>
+<tr id="team:13"><td class="scorepl">15</td><td class="scoretn">Rush B</td><td class="scorenc">6</td><td class="scorett">439</td><td class="score_correct">1/16</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct score_first">2/10</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/94</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/82</td><td class="score_neutral">0</td><td class="score_correct">1/35</td><td class="score_neutral">0</td><td class="score_correct">2/142</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:22"><td class="scorepl">16</td><td class="scoretn">Blub</td><td class="scorenc">6</td><td class="scorett">494</td><td class="score_correct">4/56</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/28</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_correct">1/20</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/111</td><td class="score_neutral">0</td><td class="score_correct">1/69</td><td class="score_neutral">0</td><td class="score_correct">3/90</td><td class="score_incorrect">4</td><td class="score_neutral">0</td></tr>
+<tr id="team:49"><td class="scorepl">17</td><td class="scoretn">O(shit!)</td><td class="scorenc">6</td><td class="scorett">588</td><td class="score_correct">1/25</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/76</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/67</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/246</td><td class="score_neutral">0</td><td class="score_correct">1/51</td><td class="score_neutral">0</td><td class="score_correct">1/103</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:51"><td class="scorepl">18</td><td class="scoretn">CHelle</td><td class="scorenc">6</td><td class="scorett">602</td><td class="score_correct">1/7</td><td class="score_correct">1/122</td><td class="score_neutral">0</td><td class="score_correct">1/77</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/140</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/202</td><td class="score_neutral">0</td><td class="score_correct">1/54</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:67"><td class="scorepl">19</td><td class="scoretn" style="background: #d9d9d9;">OrzzrO</td><td class="scorenc">6</td><td class="scorett">1068</td><td class="score_correct">1/14</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/85</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">4/171</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/183</td><td class="score_neutral">0</td><td class="score_correct">2/195</td><td class="score_neutral">0</td><td class="score_correct">6/220</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:53"><td class="scorepl">20</td><td class="scoretn">Crocozaur</td><td class="scorenc">5</td><td class="scorett">515</td><td class="score_correct">1/44</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/37</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/77</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/231</td><td class="score_neutral">0</td><td class="score_correct">1/86</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:23"><td class="scorepl">21</td><td class="scoretn">The Mind</td><td class="scorenc">5</td><td class="scorett">548</td><td class="score_correct">1/16</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/72</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/96</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_correct">1/136</td><td class="score_neutral">0</td><td class="score_correct">4/168</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:41"><td class="scorepl">22</td><td class="scoretn">Michel&apos;sBuebe</td><td class="scorenc">5</td><td class="scorett">600</td><td class="score_correct">2/14</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">3/100</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/215</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/181</td><td class="score_neutral">0</td><td class="score_correct">1/30</td><td class="score_neutral">0</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:38"><td class="scorepl">23</td><td class="scoretn">Späckbuebe</td><td class="scorenc">5</td><td class="scorett">626</td><td class="score_correct">3/54</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/93</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/70</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/254</td><td class="score_neutral">0</td><td class="score_correct">1/115</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:8"><td class="scorepl">24</td><td class="scoretn">BigVongHongHongDong</td><td class="scorenc">5</td><td class="scorett">663</td><td class="score_correct">6/29</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_correct">1/88</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/110</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/152</td><td class="score_neutral">0</td><td class="score_correct">1/164</td><td class="score_neutral">0</td><td class="score_incorrect">11</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:25"><td class="scorepl">25</td><td class="scoretn">Nooting for a living</td><td class="scorenc">5</td><td class="scorett">764</td><td class="score_correct">1/50</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">6/240</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/41</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/229</td><td class="score_neutral">0</td><td class="score_correct">1/104</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:35"><td class="scorepl">26</td><td class="scoretn">The other teams are -273.15°C</td><td class="scorenc">5</td><td class="scorett">941</td><td class="score_correct">2/164</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/77</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/62</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">4/261</td><td class="score_neutral">0</td><td class="score_correct">2/237</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:65"><td class="scorepl">27</td><td class="scoretn" style="background: #d9d9d9;">Les Dzodzets</td><td class="scorenc">4</td><td class="scorett">445</td><td class="score_correct">2/27</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">2/85</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/160</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_correct">1/93</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:37"><td class="scorepl">28</td><td class="scoretn">Les Tractologues 🚜</td><td class="scorenc">4</td><td class="scorett">477</td><td class="score_correct">4/112</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">1/30</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/101</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/134</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:10"><td class="scorepl">29</td><td class="scoretn">MPR</td><td class="scorenc">4</td><td class="scorett">493</td><td class="score_correct">6/47</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/115</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/70</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/141</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:63"><td class="scorepl">30</td><td class="scoretn">Robert&apos;); DROP TABLE Students;--</td><td class="scorenc">4</td><td class="scorett">494</td><td class="score_correct">3/30</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/109</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/153</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">1/122</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:48"><td class="scorepl">31</td><td class="scoretn" style="background: #d9d9d9;">Electroknights</td><td class="scorenc">4</td><td class="scorett">515</td><td class="score_correct">1/71</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/36</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/192</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/216</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">7</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:33"><td class="scorepl">32</td><td class="scoretn">Glod</td><td class="scorenc">4</td><td class="scorett">538</td><td class="score_correct">6/45</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/90</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/131</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/152</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:24"><td class="scorepl">33</td><td class="scoretn">vector&lt;nithorynque&gt;</td><td class="scorenc">4</td><td class="scorett">593</td><td class="score_correct">6/229</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/36</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/62</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_correct">1/166</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:59"><td class="scorepl">34</td><td class="scoretn">Härdöpfel</td><td class="scorenc">4</td><td class="scorett">628</td><td class="score_correct">4/225</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">2/61</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/88</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/134</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:19"><td class="scorepl">35</td><td class="scoretn">KSZ</td><td class="scorenc">4</td><td class="scorett">650</td><td class="score_correct">7/132</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_correct">2/86</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/197</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/95</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:39"><td class="scorepl">36</td><td class="scoretn" style="background: #d9d9d9;">TheraPysts</td><td class="scorenc">4</td><td class="scorett">766</td><td class="score_correct">1/191</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">5/220</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/50</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/205</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:5"><td class="scorepl">37</td><td class="scoretn">Love is still the answer</td><td class="scorenc">4</td><td class="scorett">874</td><td class="score_correct">1/157</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">13/268</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/68</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/141</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:11"><td class="scorepl">38</td><td class="scoretn">The Garbage Collectors</td><td class="scorenc">4</td><td class="scorett">886</td><td class="score_correct">5/61</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/154</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">7/219</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/192</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:43"><td class="scorepl">39</td><td class="scoretn">Ragazzi</td><td class="scorenc">4</td><td class="scorett">986</td><td class="score_correct">3/22</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">18/230</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">5/204</td><td class="score_neutral">0</td><td class="score_correct">1/70</td><td class="score_neutral">0</td><td class="score_incorrect">8</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:54"><td class="scorepl">40</td><td class="scoretn">Heap Heap Hooray</td><td class="scorenc">4</td><td class="scorett">1007</td><td class="score_correct">7/152</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">6/180</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">4/252</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/123</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:18"><td class="scorepl">41</td><td class="scoretn">Team Blegz</td><td class="scorenc">4</td><td class="scorett">1097</td><td class="score_correct">6/68</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">15/224</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/152</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/233</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:4"><td class="scorepl">42</td><td class="scoretn">implémentateurs</td><td class="scorenc">4</td><td class="scorett">1165</td><td class="score_correct">13/267</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/76</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">4/94</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">8/248</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:29"><td class="scorepl">43</td><td class="scoretn">Tagne</td><td class="scorenc">3</td><td class="scorett">229</td><td class="score_correct">2/13</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/87</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/109</td><td class="score_neutral">0</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:9"><td class="scorepl">44</td><td class="scoretn">soi züriwinti</td><td class="scorenc">3</td><td class="scorett">278</td><td class="score_correct">3/21</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_correct">3/92</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_correct">2/65</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:60"><td class="scorepl">45</td><td class="scoretn">CalumVonMoger</td><td class="scorenc">3</td><td class="scorett">457</td><td class="score_correct">2/60</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/114</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/263</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:17"><td class="scorepl">46</td><td class="scoretn">Tarteam</td><td class="scorenc">3</td><td class="scorett">478</td><td class="score_correct">6/85</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/143</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">1/130</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:34"><td class="scorepl">47</td><td class="scoretn" style="background: #d9d9d9;">Blue-first search</td><td class="scorenc">3</td><td class="scorett">483</td><td class="score_correct">1/28</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">9/190</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">7</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/65</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:20"><td class="scorepl">48</td><td class="scoretn">ICICNous</td><td class="scorenc">3</td><td class="scorett">504</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/247</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/180</td><td class="score_neutral">0</td><td class="score_correct">1/57</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:56"><td class="scorepl">49</td><td class="scoretn">Magic.Solution();</td><td class="scorenc">3</td><td class="scorett">564</td><td class="score_correct">5/63</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">4/197</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/164</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_incorrect">10</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:7"><td class="scorepl">50</td><td class="scoretn">Alone boy</td><td class="scorenc">3</td><td class="scorett">570</td><td class="score_correct">2/36</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/214</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/260</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:31"><td class="scorepl">51</td><td class="scoretn">King of Hell 😈</td><td class="scorenc">3</td><td class="scorett">589</td><td class="score_correct">7/42</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">4/251</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/116</td><td class="score_neutral">0</td><td class="score_incorrect">14</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:42"><td class="scorepl">52</td><td class="scoretn">Oh no.</td><td class="scorenc">3</td><td class="scorett">592</td><td class="score_correct">4/249</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/209</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/34</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:45"><td class="scorepl">53</td><td class="scoretn">Ivo19</td><td class="scorenc">3</td><td class="scorett">861</td><td class="score_correct">7/41</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">9/262</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">13</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">3/238</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:58"><td class="scorepl">54</td><td class="scoretn">Strong Exponential Time Hypothesis</td><td class="scorenc">2</td><td class="scorett">111</td><td class="score_correct">1/11</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/100</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:71"><td class="scorepl">55</td><td class="scoretn">Onagan</td><td class="scorenc">2</td><td class="scorett">185</td><td class="score_correct">4/76</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_correct">1/49</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">11</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:72"><td class="scorepl">56</td><td class="scoretn" style="background: #d9d9d9;">│ │█ █│█││ █│█│█│ │█ █│││││█ │█ █ │█│││ │█ █│</td><td class="scorenc">2</td><td class="scorett">186</td><td class="score_correct">4/75</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">7</td><td class="score_neutral">0</td><td class="score_correct">1/51</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:55"><td class="scorepl">57</td><td class="scoretn">h31d1</td><td class="scorenc">2</td><td class="scorett">238</td><td class="score_correct">3/50</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/128</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:62"><td class="scorepl">58</td><td class="scoretn">Uster et al.</td><td class="scorenc">2</td><td class="scorett">285</td><td class="score_correct">3/139</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/106</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:26"><td class="scorepl">59</td><td class="scoretn">Team Eiffel</td><td class="scorenc">2</td><td class="scorett">308</td><td class="score_correct">4/168</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">13</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/80</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:12"><td class="scorepl">60</td><td class="scoretn">Ivo18</td><td class="scorenc">2</td><td class="scorett">418</td><td class="score_correct">5/132</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">9</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">2</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/186</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:61"><td class="scorepl">61</td><td class="scoretn">goggle</td><td class="scorenc">2</td><td class="scorett">454</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">9</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">6/250</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">2/84</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:69"><td class="scorepl">62</td><td class="scoretn">Aperture Science</td><td class="scorenc">2</td><td class="scorett">643</td><td class="score_correct">6/133</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_correct">9/250</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:50"><td class="scorepl">63</td><td class="scoretn" style="background: #d9d9d9;">OldSchool</td><td class="scorenc">1</td><td class="scorett">119</td><td class="score_correct">4/59</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:3"><td class="scorepl">64</td><td class="scoretn">Tototo</td><td class="scorenc">1</td><td class="scorett">170</td><td class="score_incorrect">9</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_correct">1/170</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:70"><td class="scorepl">65</td><td class="scoretn">Alice in Codingland</td><td class="scorenc">1</td><td class="scorett">321</td><td class="score_correct">4/261</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:28"><td class="scorepl">66</td><td class="scoretn">1m2019</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:2"><td class="scorepl"></td><td class="scoretn">4e756c6c</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">3</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:57"><td class="scorepl"></td><td class="scoretn" style="background: #d9d9d9;">5workPython</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">6</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:14"><td class="scorepl"></td><td class="scoretn">Furry Salmons</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">4</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">7</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:52"><td class="scorepl"></td><td class="scoretn">In carbo</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:73"><td class="scorepl"></td><td class="scoretn">Shrubbery</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+<tr id="team:6"><td class="scorepl"></td><td class="scoretn">Victor</td><td class="scorenc">0</td><td class="scorett">0</td><td class="score_incorrect">1</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_incorrect">5</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td><td class="score_neutral">0</td></tr>
+</tbody>
+
+<tbody><tr id="scoresummary" title="#submitted / #correct"><td title="total teams">72</td><td title=" ">Summary</td><td title="total solved" class="scorenc">316</td><td title=" "></td><td>218/62</td><td>39/15</td><td>34/0</td><td>246/51</td><td>17/7</td><td>6/1</td><td>146/49</td><td>17/8</td><td>3/0</td><td>78/28</td><td>0/0</td><td>106/56</td><td>0/0</td><td>138/20</td><td>31/14</td><td>18/5</td></tr>
+</tbody>
+</table>
+
+<p><br /><br /></p>
+<table id="categ_legend" class="scoreboard scorelegend">
+<thead><tr><th scope="col">Categories</th></tr></thead>
+<tbody>
+<tr style="background: #d9d9d9;"><td>Professionals</td></tr>
+<tr><td>Students</td></tr>
+</tbody>
+</table>
+&nbsp;
+<table id="cell_legend" class="scoreboard scorelegend">
+<thead><tr><th scope="col">Cell colours</th></tr></thead>
+<tbody>
+<tr class="score_first"><td>Solved first</td></tr>
+<tr class="score_correct"><td>Solved</td></tr>
+<tr class="score_incorrect"><td>Tried, incorrect</td></tr>
+<tr class="score_neutral"><td>Untried</td></tr>
+</tbody>
+</table>
+</body>
+</html>
